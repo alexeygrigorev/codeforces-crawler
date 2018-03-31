@@ -62,23 +62,10 @@ Next, let it scrape:
         -e NUM_EXECUTORS="6" \
         codeforces-scraper scrape
 
-    docker run --rm  \
-        --name codeforces-scraper-1 \
-        -e MYSQL_HOST="$MYSQL_HOST" \
-        -e MYSQL_DATABASE="$MYSQL_DATABASE" \
-        -e MYSQL_USER="$MYSQL_USER" \
-        -e MYSQL_PASSWORD="$MYSQL_PASSWORD" \
-        -e NUM_EXECUTORS="6" \
-        codeforces-scraper scrape
 
 You can see the logs:
 
-
-
-
-
-Running
-
+    docker logs codeforces-scraper-0 -f
 
 
 ## Dependencies
