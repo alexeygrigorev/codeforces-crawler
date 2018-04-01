@@ -102,7 +102,7 @@ You can run multiple scrapers:
     for i in 1 2 3 4 5
     do
         docker run -d --rm \
-            --name  \
+            --name codeforces-scraper-$i \
             -e MYSQL_HOST="$MYSQL_HOST" \
             -e MYSQL_DATABASE="$MYSQL_DATABASE" \
             -e MYSQL_USER="$MYSQL_USER" \
