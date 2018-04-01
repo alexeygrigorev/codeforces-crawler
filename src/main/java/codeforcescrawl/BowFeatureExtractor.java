@@ -17,11 +17,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.zip.GZIPOutputStream;
 
-import com.fasterxml.jackson.jr.ob.JSON;
+//import com.fasterxml.jackson.jr.ob.JSON;
 
 public class BowFeatureExtractor {
 
-    public static void main(String[] args) throws Exception {
+    /*public static void main(String[] args) throws Exception {
         List<Submission> submissions = extract();
 
         File file = new File("out.json.gz");
@@ -128,5 +128,5 @@ public class BowFeatureExtractor {
         return res;
     }
 
-
+*/
 }

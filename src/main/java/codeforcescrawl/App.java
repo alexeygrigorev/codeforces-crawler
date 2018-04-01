@@ -8,9 +8,11 @@ public class App {
 
         String name = args[0];
 
-        if ("get-tasks".equals(name)) {
+        if ("scrape-tasks".equals(name)) {
             ProblemSubmissionUrlExtractor.main(args);
-        } else if ("scrape".equals(name)) {
+        } else if ("enqueue-tasks".equals(name)) {
+            EnqueueTasks.main(args);
+        } else if ("scrape-code".equals(name)) {
             CodeExtractor.main(args);
         }
     }

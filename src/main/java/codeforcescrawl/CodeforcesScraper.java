@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
-public class CodeforcesScraper implements Closeable {
+public class CodeforcesScraper {
 
     private final WebDriver driver;
     private final WebDriverWait wait;
@@ -32,7 +32,6 @@ public class CodeforcesScraper implements Closeable {
             List<WebElement> elements = driver.findElements(By.cssSelector("a[title='Participants solved the problem']"));
 
             for (WebElement a : elements) {
-                //pw.println(a.getAttribute("href"));
                 String taskUrl = a.getAttribute("href");
                 db.addTask(taskUrl);
                 System.out.println(taskUrl);
@@ -160,9 +159,4 @@ public class CodeforcesScraper implements Closeable {
         link.click();
     }
 
-    @Override
-    public void close() throws IOException {
-        driver.close();
-        driver.quit();
-    }
 }

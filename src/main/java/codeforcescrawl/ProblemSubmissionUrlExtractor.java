@@ -7,7 +7,7 @@ public class ProblemSubmissionUrlExtractor {
     public static void main(String[] args) throws Exception {
         System.setProperty("webdriver.gecko.driver", "bin/geckodriver");
 
-        Database db = Factory.createDatasource();
+        Database db = Factory.createDatabase();
         WebDriver driver = Factory.createFirefoxDriver();
         CodeforcesScraper scraper = new CodeforcesScraper(driver, db);
 
