@@ -23,16 +23,15 @@ public class CodeExtractor {
 
         LOGGER.debug("there are {} tasks in the queue", tasks.size());
 
-//        while (!tasks.isEmpty()) {
-//            try {
-//                String url = tasks.poll();
-        String url = "http://codeforces.com/problemset/status/954/problem/F";
+        while (!tasks.isEmpty()) {
+            try {
+                String url = tasks.poll();
                 scraper.scrapeTask(url);
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//                continue;
-//            }
-//        }
+            } catch (Exception e) {
+                e.printStackTrace();
+                continue;
+            }
+        }
 
         redisson.shutdown();
     }

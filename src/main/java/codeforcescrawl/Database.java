@@ -88,9 +88,9 @@ public class Database {
         }
     }
 
-    public List<String> allTasks() throws SQLException {
+    public List<String> allUnscrapedTasks() throws SQLException {
         List<String> tasks = new ArrayList<>(0);
-        String query = "SELECT url FROM tasks;";
+        String query = "SELECT url FROM tasks WHERE scraped = false;";
 
         try (Connection connection = db.getConnection();
              PreparedStatement statement = connection.prepareStatement(query);
@@ -102,5 +102,15 @@ public class Database {
         }
 
         return tasks;
+    }
+
+    public boolean markTaskScraped(String url) throws SQLException {
+        String sql = "UPDATE tasks SET scraped = true WHERE task = ?;";
+
+        try (Connection connection = db.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, url);
+            return ps.execute();
+        }
     }
 }

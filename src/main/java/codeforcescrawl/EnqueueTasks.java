@@ -16,7 +16,7 @@ public class EnqueueTasks {
         RQueue<String> queue = client.getQueue("tasks");
 
         System.out.println("populating the queue");
-        List<String> tasks = db.allTasks();
+        List<String> tasks = db.allUnscrapedTasks();
 
         for (String task : tasks) {
             queue.add(task);

@@ -46,11 +46,6 @@ public class CodeforcesScraper {
     public void scrapeTask(String url) throws Exception {
         LOGGER.info("processing task {}", url);
 
-        if (db.urlAlreadyProcessed(url)) {
-            LOGGER.info("task {} is already processed", url);
-            return;
-        }
-
         String startUrl = url + "/page/1?order=BY_ARRIVED_DESC";
         driver.get(startUrl);
         Thread.sleep(2000);
@@ -89,7 +84,7 @@ public class CodeforcesScraper {
             }
         }
 
-        db.markUrlAsProcessed(url);
+        db.markTaskScraped(url);
     }
 
     private void scrapeUrl(String url) throws Exception {
