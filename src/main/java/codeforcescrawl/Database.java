@@ -105,7 +105,7 @@ public class Database {
     }
 
     public boolean markTaskScraped(String url) throws SQLException {
-        String sql = "UPDATE tasks SET scraped = true WHERE task = ?;";
+        String sql = "UPDATE tasks SET scraped = true WHERE url = ?;";
 
         try (Connection connection = db.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {

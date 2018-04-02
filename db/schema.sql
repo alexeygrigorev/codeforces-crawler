@@ -8,7 +8,7 @@ CREATE TABLE `submissions` (
   `source` varchar(20000) COLLATE utf8_unicode_ci NOT NULL,
   `status` varchar(45) COLLATE utf8_unicode_ci NOT NULL,
   `language` varchar(45) COLLATE utf8_unicode_ci NOT NULL,
-  `problem` varchar(45) COLLATE utf8_unicode_ci NOT NULL,
+  `problem` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (`submission_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 

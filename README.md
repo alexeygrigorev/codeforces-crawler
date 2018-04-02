@@ -69,6 +69,7 @@ First add the tasks:
         -e MYSQL_PASSWORD="$MYSQL_PASSWORD" \
         codeforces-scraper scrape-tasks
 
+
 Then add them to the redis queue:
 
     docker run -it --rm \
@@ -79,6 +80,12 @@ Then add them to the redis queue:
         -e REDIS_HOST="$REDIS_HOST" \
         codeforces-scraper enqueue-tasks
 
+Check that the tasks are added to the queue:
+
+    docker exec -it redis redis-cli
+
+    127.0.0.1:6379> LLEN tasks
+    (integer) 4065
 
 Next, let it scrape:
 
