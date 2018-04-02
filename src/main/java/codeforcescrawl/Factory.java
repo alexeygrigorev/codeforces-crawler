@@ -4,12 +4,16 @@ import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxDriverLogLevel;
 import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.logging.LogType;
+import org.openqa.selenium.logging.LoggingPreferences;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
 
 import java.util.Map;
+import java.util.logging.Level;
 
 public class Factory {
     public static Database createDatabase() {
@@ -35,6 +39,7 @@ public class Factory {
         firefoxBinary.addCommandLineOptions("--headless");
         FirefoxOptions firefoxOptions = new FirefoxOptions();
         firefoxOptions.setBinary(firefoxBinary);
+        firefoxOptions.setLogLevel(FirefoxDriverLogLevel.WARN);
         return new FirefoxDriver(firefoxOptions);
     }
 

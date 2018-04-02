@@ -15,7 +15,7 @@ public class App {
         } else if ("scrape-code".equals(name)) {
             CodeExtractor.main(args);
         } else {
-            System.out.println("unrecognized parameter " + name);
+            System.err.println("unrecognized parameter " + name);
             System.exit(1);
         }
     }

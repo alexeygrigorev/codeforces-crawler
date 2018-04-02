@@ -5,6 +5,8 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -12,6 +14,8 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class CodeforcesScraper {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CodeforcesScraper.class);
 
     private final WebDriver driver;
     private final WebDriverWait wait;
@@ -40,10 +44,10 @@ public class CodeforcesScraper {
     }
 
     public void scrapeTask(String url) throws Exception {
-        System.out.println("processing " + url);
+        LOGGER.info("processing task {}", url);
 
         if (db.urlAlreadyProcessed(url)) {
-            System.out.println("already processed " + url);
+            LOGGER.info("task {} is already processed", url);
             return;
         }
 
@@ -64,18 +68,20 @@ public class CodeforcesScraper {
             max = Math.max(max, Integer.parseInt(span.getAttribute("pageindex")));
         }
 
-        System.out.println("max=" + max);
+        LOGGER.debug("task {} has {} pages", url, max);
 
         for (int page = 1; page <= max; page++) {
             String pageUrl = url + "/page/" + page + "?order=BY_ARRIVED_DESC";
-            System.out.println("processing " + pageUrl);
-            if (db.urlAlreadyProcessed(url)) {
-                System.out.println("already processed " + pageUrl);
+            if (db.urlAlreadyProcessed(pageUrl)) {
+                LOGGER.debug("already processed page {}", pageUrl);
                 continue;
             }
 
+            LOGGER.debug("scraping all submissions from {}", pageUrl);
+
             try {
                 scrapeUrl(pageUrl);
+                LOGGER.debug("page {} is scraped", pageUrl);
                 db.markUrlAsProcessed(pageUrl);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -113,6 +119,7 @@ public class CodeforcesScraper {
         WebElement link = row.findElement(By.cssSelector("a.view-source"));
         int submissionId = Integer.parseInt(link.getText());
         if (db.alreadyScraped(submissionId)) {
+            LOGGER.debug("submission {} is already scraped, skipping it", submissionId);
             return null;
         }
 
@@ -121,7 +128,7 @@ public class CodeforcesScraper {
 
     private Submission scrapeSubmission(int submissionId, WebElement row, WebElement link)
             throws Exception {
-        System.out.println("opening " + submissionId);
+        LOGGER.debug("scraping submission {}...", submissionId);
 
         WebElement languageTd = row.findElement(By.xpath("td[5]"));
         String language = languageTd.getText();
@@ -140,11 +147,11 @@ public class CodeforcesScraper {
 
         Submission result = new Submission(submissionId, language, status, problem, source);
 
-        System.out.println("closing...");
         driver.findElement(By.cssSelector("#facebox .close")).click();
         Thread.sleep(100);
 
         if (source.length() >= 20000) {
+            LOGGER.info("submission {} is too large, skipping it", submissionId);
             return null;
         }
 
