@@ -20,6 +20,6 @@ CREATE TABLE `urls` (
 CREATE TABLE `tasks` (
   `task_id` int NOT NULL AUTO_INCREMENT,
   `url` varchar(100) NOT NULL,
-  `scraped` bool NOT NULL;
+  `scraped` bool NOT NULL,
   PRIMARY KEY (`task_id`)
 );

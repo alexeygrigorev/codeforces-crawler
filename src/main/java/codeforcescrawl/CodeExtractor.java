@@ -15,8 +15,6 @@ public class CodeExtractor {
 
         System.setProperty("webdriver.gecko.driver", "bin/geckodriver");
         Database db = Factory.createDatabase();
-        WebDriver driver = Factory.createFirefoxDriver();
-        CodeforcesScraper scraper = new CodeforcesScraper(driver, db);
 
         RedissonClient redisson = Factory.createRedissonClient();
         RQueue<String> tasks = redisson.getQueue("tasks");
@@ -24,13 +22,24 @@ public class CodeExtractor {
         LOGGER.debug("there are {} tasks in the queue", tasks.size());
 
         while (!tasks.isEmpty()) {
+            String url = tasks.poll();
+
+            WebDriver driver = Factory.createFirefoxDriver();
+            CodeforcesScraper scraper = new CodeforcesScraper(driver, db);
+
             try {
-                String url = tasks.poll();
                 scraper.scrapeTask(url);
             } catch (Exception e) {
+                LOGGER.warn("got an exception:", e);
                 e.printStackTrace();
-                continue;
+                LOGGER.info("resubmitting the task {} to be scraped later", url);
+                tasks.offer(url);
             }
+
+            // for long running jobs it's better to restart the browser
+            // to avoid memory leaks
+            driver.quit();
+            driver.close();
         }
 
         redisson.shutdown();
