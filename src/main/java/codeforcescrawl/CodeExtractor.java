@@ -38,8 +38,8 @@ public class CodeExtractor {
 
             // for long running jobs it's better to restart the browser
             // to avoid memory leaks
-            driver.quit();
             driver.close();
+            driver.quit();
         }
 
         redisson.shutdown();
