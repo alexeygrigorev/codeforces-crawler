@@ -84,7 +84,7 @@ public class CodeforcesScraper {
             }
         }
 
-        LOGGER.debug("scraping all submissions from {}", pageUrl);
+        LOGGER.debug("scraping all submissions from {}", url);
         db.markTaskScraped(url);
     }
 
