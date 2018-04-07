@@ -1,14 +1,20 @@
 ## Build & Run
 
 For using this package you need maven and docker.
-Docker is optional, but simplifies running the code.
+Docker is optional, but simplifies the setup: without docker you
+need to install redis and mysql yourself.
+
+
+### Building
 
 Building:
 
     mvn package
     docker build -t codeforces-scraper .
 
-Setting up a redis instance:
+### Redis
+
+Setting up a redis instance with `docker`:
 
     REDIS_CONTAINER_NAME="redis"
 
@@ -21,12 +27,12 @@ Setting up a redis instance:
 
 Checking that redis works:
 
-    docker exec -it redis redis-cli
+    docker exec redis redis-cli ping
 
-    127.0.0.1:6379> ping
-    PONG
 
-Setting up mysql instance:
+### MySQL
+
+Setting up a mysql instance with `docker`:
 
     MYSQL_CONTAINER_NAME=mysql
     MYSQL_DATABASE=code
@@ -44,19 +50,14 @@ Setting up mysql instance:
     MYSQL_HOST=`docker inspect ${MYSQL_CONTAINER_NAME} \
        --format='{{.NetworkSettings.IPAddress}}'`
 
-    mysql --host="$MYSQL_HOST" \
-        -u"$MYSQL_USER" \
-        -p"$MYSQL_PASSWORD" \
-        $MYSQL_DATABASE \
-        < db/schema.sql
-
-If you don't have a mysql client, you can do it from inside the container:
-
     docker exec -i mysql mysql \
         -u"$MYSQL_USER" \
         -p"$MYSQL_PASSWORD" \
         $MYSQL_DATABASE \
         < db/schema.sql
+
+
+### Running
 
 Now run the app.
 
@@ -82,10 +83,7 @@ Then add them to the redis queue:
 
 Check that the tasks are added to the queue:
 
-    docker exec -it redis redis-cli
-
-    127.0.0.1:6379> LLEN tasks
-    (integer) 4065
+    docker exec -it redis redis-cli LLEN tasks
 
 Next, let it scrape:
 
@@ -106,8 +104,7 @@ Checking logs:
 
 You can run multiple scrapers:
 
-    for i in 1 2 3 4 5
-    do
+    for i in 0 1 2 3 4 5; do
         docker run -d --rm \
             --name codeforces-scraper-$i \
             -e MYSQL_HOST="$MYSQL_HOST" \
@@ -120,19 +117,43 @@ You can run multiple scrapers:
 
 Logging from all containers at once:
 
-    for i in 0 1 2 3 4 5
-    do
+    for i in 0 1 2 3 4 5; do
         docker logs -f --tail=30 codeforces-scraper-$i \
             | sed -e 's/^/container-'$i': /' &
     done
 
 
+### Results
+
+You can check how many submission are already scraped by counting rows in the `submission` table:
+
+    docker exec mysql mysql \
+        -u"$MYSQL_USER" \
+        -p"$MYSQL_PASSWORD" \
+        -e 'select count(1) from submissions' \
+        $MYSQL_DATABASE
+
+It is also possible to check how many problems are still to be scraped: 
+
+    docker exec redis redis-cli llen tasks
+
+
+Once you have scraped enough, you can dump the data:
+
+    docker exec mysql mysqldump \
+        -u"$MYSQL_USER" \
+        -p"$MYSQL_PASSWORD" \
+        $MYSQL_DATABASE \
+        | gzip -c \
+        > codeforces_dump.sql.gz
+
+
 ## Dependencies
 
-It already has `geckodriver` in `bin`. It was downloaded this way:
+For scraping it uses Selenium via Geckodriver v0.20.0. The `geckodriver` binary is already downloaded and put to the `bin` folder. It was downloaded this way:
 
     # from https://github.com/mozilla/geckodriver/releases
     wget https://github.com/mozilla/geckodriver/releases/download/v0.20.0/geckodriver-v0.20.0-linux64.tar.gz
     tar xzf geckodriver-v0.20.0-linux64.tar.gz
     rm geckodriver-v0.20.0-linux64.tar.gz
-    mv geckodriver bin/
+    mv geckodriver bin/ 
