@@ -63,7 +63,7 @@ Now run the app.
 
 First add the tasks:
 
-    docker run -it --rm \
+    docker run --rm \
         -e MYSQL_HOST="$MYSQL_HOST" \
         -e MYSQL_DATABASE="$MYSQL_DATABASE" \
         -e MYSQL_USER="$MYSQL_USER" \
@@ -73,7 +73,7 @@ First add the tasks:
 
 Then add them to the redis queue:
 
-    docker run -it --rm \
+    docker run --rm \
         -e MYSQL_HOST="$MYSQL_HOST" \
         -e MYSQL_DATABASE="$MYSQL_DATABASE" \
         -e MYSQL_USER="$MYSQL_USER" \
@@ -83,7 +83,7 @@ Then add them to the redis queue:
 
 Check that the tasks are added to the queue:
 
-    docker exec -it redis redis-cli LLEN tasks
+    docker exec redis redis-cli LLEN tasks
 
 Next, let it scrape:
 
