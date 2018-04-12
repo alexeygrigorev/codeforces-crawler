@@ -148,6 +148,10 @@ Once you have scraped enough, you can dump the data:
         > codeforces_dump.sql.gz
 
 
+Alternatively, you can get the json data:
+
+
+
 ## Dependencies
 
 For scraping it uses Selenium via Geckodriver v0.20.0. The `geckodriver` binary is already downloaded and put to the `bin` folder. It was downloaded this way:
