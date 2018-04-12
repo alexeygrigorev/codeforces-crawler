@@ -1,60 +1,91 @@
 package codeforcescrawl;
 
-import java.io.BufferedOutputStream;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.zip.GZIPOutputStream;
+import java.util.concurrent.atomic.AtomicInteger;
 
-//import com.fasterxml.jackson.jr.ob.JSON;
 
 public class BowFeatureExtractor {
 
-    /*public static void main(String[] args) throws Exception {
-        List<Submission> submissions = extract();
+    private static final Logger LOGGER = LoggerFactory.getLogger(BowFeatureExtractor.class);
 
-        File file = new File("out.json.gz");
-        try (OutputStream os = new BufferedOutputStream(new FileOutputStream(file))) {
-            try (GZIPOutputStream gzip = new GZIPOutputStream(os, false)) {
-                try (PrintWriter pw = new PrintWriter(gzip)) {
-                    writeSubmissions(pw, submissions);
-                }
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
+    public static void main(String[] args) throws Exception {
+        Database db = Factory.createDatabase();
+
+        boolean tokenized = false;
+        if (args.length > 0) {
+            if ("tokenized".equals(args[0])) {
+                tokenized = true;
             }
+        }
+
+        AtomicInteger cnt = new AtomicInteger();
+
+        new File("out").mkdirs();
+        PrintWriter pw = null;
+        if (tokenized) {
+            pw = new PrintWriter("out/dump-tokenized.jsonl");
+        } else {
+            pw = new PrintWriter("out/dump-original.jsonl");
+        }
+
+        PrintWriter finalPw = pw;
+        boolean finalTokenized = tokenized;
+
+        db.iterateOverAllScrapedSubmissions(submission -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("submission_id", submission.getSubmissionId());
+            map.put("language", submission.getLanguage());
+
+            if (finalTokenized) {
+                String tokens = tokenize(submission.getSource());
+                map.put("source", tokens);
+            } else {
+                map.put("source", submission.getSource());
+            }
+
+            String json = toJson(map);
+            finalPw.println(json);
+
+            if (cnt.incrementAndGet() % 1000 == 0) {
+                LOGGER.debug("so far processed {} lines", cnt);
+            }
+        });
+
+        pw.flush();
+        pw.close();
+    }
+
+    private static String toJson(Map<String, Object> map) {
+        try {
+            return OBJECT_MAPPER.writeValueAsString(map);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    public static void writeSubmissions(PrintWriter pw, List<Submission> submissions) throws Exception {
-        int cnt = 0;
-
-        for (Submission submission : submissions) {
-            Map<String, Object> json = new HashMap<>();
-            json.put("submission_id", submission.getSubmissionId());
-            json.put("language", submission.getLanguage());
-
-            List<String> tokens = tokenize(submission.getSource());
-            json.put("source", tokens);
-
-            pw.println(JSON.std.asString(json));
-
-            cnt++;
-            if (cnt % 2500 == 0) {
-                System.out.println("processing " + cnt + "th submission...");
-            }
+    private static String tokenize(String source) {
+        try {
+            return tokenizeUnsafe(source);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
-    private static List<String> tokenize(String source) throws Exception {
+    private static String tokenizeUnsafe(String source) throws Exception {
         List<String> result = new ArrayList<>();
         StreamTokenizer tokenizer = new StreamTokenizer(new StringReader(source));
 
@@ -103,30 +134,9 @@ public class BowFeatureExtractor {
             }
         }
 
-        return result;
+        return String.join(" ", result);
     }
 
-    private static List<Submission> extract() throws Exception {
-        String query = "SELECT submission_id, source, language, status FROM submissions";
 
-        Class.forName("com.mysql.jdbc.Driver");
-        Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/codeforces", "root", "");
 
-        List<Submission> res = new ArrayList<>();
-
-        try (Statement statement = conn.createStatement();
-             ResultSet rs = statement.executeQuery(query)) {
-            while (rs.next()) {
-                int submissionId = rs.getInt(1);
-                String source = rs.getString(2);
-                String language = rs.getString(3);
-                String status = rs.getString(4);
-                res.add(new Submission(submissionId, language, status, null, source));
-            }
-        }
-
-        return res;
-    }
-
-*/
 }

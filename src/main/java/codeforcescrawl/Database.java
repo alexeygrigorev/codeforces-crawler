@@ -1,12 +1,10 @@
 package codeforcescrawl;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class Database {
 
@@ -111,6 +109,22 @@ public class Database {
              PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, url);
             return ps.execute();
+        }
+    }
+
+    public void iterateOverAllScrapedSubmissions(Consumer<Submission> callback) throws SQLException {
+        String query = "SELECT submission_id, source, language, status FROM submissions";
+
+        try (Connection conn = db.getConnection();
+             Statement statement = conn.createStatement();
+             ResultSet rs = statement.executeQuery(query)) {
+            while (rs.next()) {
+                int submissionId = rs.getInt(1);
+                String source = rs.getString(2);
+                String language = rs.getString(3);
+                String status = rs.getString(4);
+                callback.accept(new Submission(submissionId, language, status, null, source));
+            }
         }
     }
 }
