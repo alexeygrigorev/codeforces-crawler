@@ -27,7 +27,6 @@ public class BowFeatureExtractor {
     public static void main(String[] args) throws Exception {
         Database db = Factory.createDatabase();
 
-        args = new String[] {"tokenized"};
         boolean tokenized = false;
         if (args.length > 0) {
             if ("tokenized".equals(args[0])) {
@@ -62,7 +61,6 @@ public class BowFeatureExtractor {
 
             String json = toJson(map);
             finalPw.println(json);
-            System.out.println(json);
 
             if (cnt.incrementAndGet() % 1000 == 0) {
                 LOGGER.debug("so far processed {} lines", cnt);
