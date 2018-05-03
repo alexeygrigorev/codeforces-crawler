@@ -1,3 +1,11 @@
+## Codeforces scraper
+
+[Codeforces.com](http://codeforces.com/) is a website for hosting programming contests. For each past competition 
+it is possible to see the source code of each submission. This project allows to scrape 
+this code and use it for analysis.
+
+Using this tool we scraped 1.2 mln submissions and made it available on kaggle datasets: https://www.kaggle.com/agrigorev/codeforces-code.
+
 ## Build & Run
 
 For using this package you need maven and docker.
